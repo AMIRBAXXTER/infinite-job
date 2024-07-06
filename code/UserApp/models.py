@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 
@@ -41,7 +43,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False, verbose_name='مدیر/عضو')
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['email']
+    REQUIRED_FIELDS = ['phone_number']
 
     @abstractmethod
     def __str__(self):
@@ -60,6 +62,9 @@ class Employer(CustomUser):
     logo = models.ImageField(upload_to='employer/logo', null=True, blank=True, verbose_name='لوگو')
     industry_type = models.CharField(max_length=50, null=True, blank=True, verbose_name='نوع صنعت')
     employees_count = models.IntegerField(null=True, blank=True, verbose_name='تعداد کارمندان')
+    groups = models.ManyToManyField('auth.Group', related_name='employer_set', verbose_name='گروه', blank=True)
+    user_permissions = models.ManyToManyField('auth.Permission', related_name='employer_set', verbose_name='دسترسی')
+
 
     def __str__(self):
         return self.company_name
@@ -118,8 +123,9 @@ class City(models.Model):
 
 
 class Address(models.Model):
-    user = models.ForeignKey(CustomUser, related_name='addresses', on_delete=models.CASCADE,
-                             verbose_name='کاربر')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
     province = models.ForeignKey(Province, related_name='addresses', on_delete=models.CASCADE, verbose_name='استان')
     city = models.ForeignKey(City, related_name='addresses', on_delete=models.CASCADE, verbose_name='شهر')
     address = models.CharField(max_length=200, verbose_name='آدرس')
@@ -128,19 +134,19 @@ class Address(models.Model):
     is_active = models.BooleanField(default=False, verbose_name='فعال/غیرفعال')
 
     def __str__(self):
-        return f'{self.user}:{self.id}'
+        return f'{self.content_object}:{self.id}'
 
     def save(self, *args, **kwargs):
         if self.is_active:
-            self.user.addresses.filter(is_active=True).update(is_active=False)
-        if not self.user.addresses.all().exists():
+            self.content_object.addresses.filter(is_active=True).update(is_active=False)
+        if not self.content_object.addresses.all().exists():
             self.is_active = True
 
         super(Address, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.is_active:
-            temp = self.user.addresses.filter(is_active=False).first()
+            temp = self.content_object.addresses.filter(is_active=False).first()
             if temp:
                 temp.is_active = True
                 temp.save()
