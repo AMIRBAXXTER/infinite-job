@@ -66,7 +66,7 @@ services:
     build:
       context: ./code
       dockerfile: Dockerfile
-    command: celery --app=config.celery_base worker -l INFO -Q tasks -E -B
+    command: celery --app=config.celery_base worker -l INFO -Q tasks,mail -E #-B
     volumes:
       - ./code:/code/
     environment:

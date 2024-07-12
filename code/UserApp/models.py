@@ -10,7 +10,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
 
@@ -41,31 +41,25 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=11, verbose_name='شماره تماس')
     is_active = models.BooleanField(default=True, verbose_name='فعال/غیرفعال')
     is_staff = models.BooleanField(default=False, verbose_name='مدیر/عضو')
+    is_employer = models.BooleanField(default=False, verbose_name='کارجو/شرکت')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone_number']
 
-    @abstractmethod
     def __str__(self):
-        pass
+        return self.phone_number
 
-    object = CustomUserManager()
-
-    class Meta:
-        abstract = True
+    objects = CustomUserManager()
 
 
-class Employer(CustomUser):
-    company_name = models.CharField(max_length=255, verbose_name='نام شرکت')
+class Employer(models.Model):
+    user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, verbose_name='کاربر')
+    company_name = models.CharField(max_length=255, null=True, blank=True, verbose_name='نام شرکت')
     website = models.CharField(max_length=255, null=True, blank=True, verbose_name='سایت')
     description = models.TextField(null=True, blank=True, verbose_name='توضیحات')
     logo = models.ImageField(upload_to='employer/logo', null=True, blank=True, verbose_name='لوگو')
     industry_type = models.CharField(max_length=50, null=True, blank=True, verbose_name='نوع صنعت')
     employees_count = models.IntegerField(null=True, blank=True, verbose_name='تعداد کارمندان')
-    groups = models.ManyToManyField('auth.Group', related_name='employer_set', verbose_name='گروه', blank=True)
-    user_permissions = models.ManyToManyField('auth.Permission', related_name='employer_set', verbose_name='دسترسی')
-
-
     def __str__(self):
         return self.company_name
 
@@ -75,15 +69,17 @@ class Employer(CustomUser):
         db_table = 'employers'
 
 
-class JobSeeker(CustomUser):
-    first_name = models.CharField(max_length=255, verbose_name='نام')
-    last_name = models.CharField(max_length=255, verbose_name='نام خانوادگی')
-    gender = models.CharField(max_length=10, verbose_name='جنسیت')
-    birth_date = models.DateField(verbose_name='تاریخ تولد')
-    national_code = models.CharField(max_length=10, verbose_name='کد ملی')
+class JobSeeker(models.Model):
+    user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE,
+                                verbose_name='کاربر')
+    first_name = models.CharField(max_length=255, null=True, blank=True, verbose_name='نام')
+    last_name = models.CharField(max_length=255, null=True, blank=True, verbose_name='نام خانوادگی')
+    gender = models.CharField(max_length=10, null=True, blank=True, choices=((1, 'مرد'), (2, 'زن')),
+                              verbose_name='جنسیت')
+    birth_date = models.DateField(null=True, blank=True, verbose_name='تاریخ تولد')
+    national_code = models.CharField(max_length=10, unique=True, null=True, blank=True, verbose_name='کد ملی')
     about_me = models.TextField(null=True, blank=True, verbose_name='درباره من')
     avatar = models.ImageField(upload_to='job_seeker/avatar', null=True, blank=True, verbose_name='تصویر پروفایل')
-    is_active = models.BooleanField(default=False, verbose_name='فعال/غیرفعال')
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
