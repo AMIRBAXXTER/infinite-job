@@ -36,10 +36,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # internal apps
     'UserApp.apps.UserAppConfig',
     'EmployersApp.apps.EmployersAppConfig',
+    # external apps
     'rest_framework',
+    'django_filters',
     'rest_framework.authtoken',
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
@@ -130,7 +134,11 @@ AUTH_USER_MODEL = 'UserApp.CustomUser'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
 }
 
 # Celery configs
@@ -162,3 +170,9 @@ CACHES = {
     }
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'infinite-job',
+    'DESCRIPTION': 'test',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}

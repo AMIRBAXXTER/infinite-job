@@ -1,4 +1,4 @@
-from random import random, randint
+from random import randint
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.cache import cache
@@ -12,30 +12,35 @@ from rest_framework.views import APIView
 from .serializers import *
 from .models import CustomUser
 from .tasks.send_mail import send_mail_task
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse
 
 
 # Create your views here.
 
-
+@extend_schema(
+    parameters=[UserRegisterSerializer],
+)
 class UserRegisterView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
 
 
 class LoginCodeRequestView(APIView):
 
+    @extend_schema(
+        parameters=[LoginCodeRequestSerializer],
+        request=LoginCodeRequestSerializer,
+    )
     def post(self, request):
         if request.user.is_authenticated:
             return Response({'error': 'User already logged in'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = LoginCodeRequestSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.data.get('email')
-            user = CustomUser.objects.filter(email=email).first()
-            if not user:
-                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
             login_code = randint(1000, 9999)
             cache_key = f'login_code_{email}'
             cache.set(cache_key, login_code, timeout=60)
-            send_mail_task.apply_async(args=['login code', str(login_code), [email]])
+            massage = f'Your login code is {login_code}'
+            send_mail_task.apply_async(args=['login code', massage, [email]])
             return Response({'message': 'Login code sent to email'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

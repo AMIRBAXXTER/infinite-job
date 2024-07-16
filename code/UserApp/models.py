@@ -41,7 +41,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=11, verbose_name='شماره تماس')
     is_active = models.BooleanField(default=True, verbose_name='فعال/غیرفعال')
     is_staff = models.BooleanField(default=False, verbose_name='مدیر/عضو')
-    is_employer = models.BooleanField(default=False, verbose_name='کارجو/شرکت')
+    is_employer = models.BooleanField(null=False, blank=False, verbose_name='کارجو/شرکت')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone_number']
