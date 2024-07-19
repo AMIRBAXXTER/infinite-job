@@ -5,8 +5,11 @@ from .views import *
 
 app_name = 'UserApp'
 
-router = DefaultRouter()
-router.register(r'users', UserProfileView, basename='users')
+employer_router = DefaultRouter()
+employer_router.register(r'employers', EmployerProfileView, basename='employers')
+
+job_seeker_router = DefaultRouter()
+job_seeker_router.register(r'job-seekers', JobSeekerProfileView,  basename='job-seekers')
 
 
 urlpatterns = [
@@ -16,5 +19,6 @@ urlpatterns = [
     path('logout/', UserLogoutView.as_view(),  name='logout'),
     path('reset-password/', ResetPasswordRequestView.as_view(),  name='reset-password'),
     path('reset-password<str:uid><str:token>', ResetPasswordConfirmView.as_view(),  name='reset-password-confirm'),
-    path('', include(router.urls)),
+    path('users/', include(employer_router.urls)),
+    path('users/', include(job_seeker_router.urls)),
 ]

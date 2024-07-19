@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 from .serializers import *
 from .models import CustomUser
 from .tasks.send_mail import send_mail_task
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample, OpenApiResponse, OpenApiRequest, \
+    extend_schema_view
 
 
 # Create your views here.
@@ -27,8 +28,20 @@ class UserRegisterView(generics.CreateAPIView):
 class LoginCodeRequestView(APIView):
 
     @extend_schema(
-        parameters=[LoginCodeRequestSerializer],
         request=LoginCodeRequestSerializer,
+        responses={
+            200: OpenApiResponse(
+                response=LoginCodeRequestSerializer,
+                examples=[OpenApiExample('Login code sent to email', {'message': 'Login code sent to email'})]
+            ),
+            400: OpenApiResponse(
+                response=LoginCodeRequestSerializer,
+                examples=[
+                    OpenApiExample('User already logged in', {'error': 'User already logged in'}),
+                    OpenApiExample('email or password is wrong!', {'error': 'email or password is wrong!'})
+                ]
+            ),
+        },
     )
     def post(self, request):
         if request.user.is_authenticated:
@@ -103,13 +116,18 @@ class ResetPasswordConfirmView(APIView):
         return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
 
 
-class UserProfileView(viewsets.ModelViewSet):
+class EmployerProfileView(viewsets.ModelViewSet):
+    serializer_class = EmployerProfileSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_serializer_class(self):
-        if self.request.user.is_employer:
-            return EmployerProfileSerializer
-        return JobSeekerProfileSerializer
+    def get_queryset(self):
+        return self.request.user.employerprofile
 
-    def destroy(self, request, *args, **kwargs):
-        return Response({'massage': 'User Profile can not be deleted'}, status=status.HTTP_400_BAD_REQUEST)
+
+class JobSeekerProfileView(viewsets.ModelViewSet):
+    serializer_class = JobSeekerProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.request.user.jobseekerprofile
+

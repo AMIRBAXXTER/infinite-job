@@ -51,7 +51,8 @@ services:
       - "5432:5432"
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./code/init.sql:/docker-entrypoint-initdb.d/init.sql
+#      - postgres_data:/var/lib/postgresql/data
 
   rabbitmq:
     image: rabbitmq:management

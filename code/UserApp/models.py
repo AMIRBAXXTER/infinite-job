@@ -53,13 +53,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class Employer(models.Model):
-    user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE, verbose_name='کاربر')
+    user = models.OneToOneField(to=CustomUser, related_name='employerprofile', on_delete=models.CASCADE, verbose_name='کاربر')
     company_name = models.CharField(max_length=255, null=True, blank=True, verbose_name='نام شرکت')
     website = models.CharField(max_length=255, null=True, blank=True, verbose_name='سایت')
     description = models.TextField(null=True, blank=True, verbose_name='توضیحات')
     logo = models.ImageField(upload_to='employer/logo', null=True, blank=True, verbose_name='لوگو')
     industry_type = models.CharField(max_length=50, null=True, blank=True, verbose_name='نوع صنعت')
     employees_count = models.IntegerField(null=True, blank=True, verbose_name='تعداد کارمندان')
+
     def __str__(self):
         return self.company_name
 
@@ -70,7 +71,7 @@ class Employer(models.Model):
 
 
 class JobSeeker(models.Model):
-    user = models.OneToOneField(to=CustomUser, on_delete=models.CASCADE,
+    user = models.OneToOneField(to=CustomUser, related_name='jobseekerprofile', on_delete=models.CASCADE,
                                 verbose_name='کاربر')
     first_name = models.CharField(max_length=255, null=True, blank=True, verbose_name='نام')
     last_name = models.CharField(max_length=255, null=True, blank=True, verbose_name='نام خانوادگی')

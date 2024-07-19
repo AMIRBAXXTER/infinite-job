@@ -6,7 +6,7 @@ from .views import *
 app_name = 'EmployersApp'
 
 router = DefaultRouter()
-router.register(r'job_advertisements', JobAdvertisementView, basename='job_advertisements')
+router.register(r'job-advertisements', JobAdvertisementView, basename='job-advertisements')
 
 urlpatterns = [
     path('', include(router.urls))

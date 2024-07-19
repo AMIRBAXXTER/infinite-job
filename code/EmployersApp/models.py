@@ -11,7 +11,7 @@ class JobAdvertisement(models.Model):
     cooperation_type = models.CharField(max_length=100,
                                         choices=[('full_time', 'full_time'), ('part_time', 'part_time')],
                                         verbose_name='نوع همکاری')
-    minimum_expertise = models.CharField(max_length=100, choices=[('less 1 year', 'less 1 year'),
+    minimum_experience = models.CharField(max_length=100, choices=[('less 1 year', 'less 1 year'),
                                                                   ('between 1 and 3 years', 'between 1 and 3 years'),
                                                                   ('between 3 and 5 years', 'between 3 and 5 years'),
                                                                   ('more than 5 years', 'more than 5 years')],
@@ -29,7 +29,7 @@ class JobAdvertisement(models.Model):
                               choices=[('male', 'male'), ('female', 'female'), ('both', 'both')],
                               verbose_name='جنسیت')
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE, verbose_name='شرکت')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
+    created_at = models.DateTimeField(auto_now_add=True,  verbose_name='تاریخ ایجاد')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاریخ به روز رسانی')
 
 
