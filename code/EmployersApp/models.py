@@ -12,10 +12,10 @@ class JobAdvertisement(models.Model):
                                         choices=[('full_time', 'full_time'), ('part_time', 'part_time')],
                                         verbose_name='نوع همکاری')
     minimum_experience = models.CharField(max_length=100, choices=[('less 1 year', 'less 1 year'),
-                                                                  ('between 1 and 3 years', 'between 1 and 3 years'),
-                                                                  ('between 3 and 5 years', 'between 3 and 5 years'),
-                                                                  ('more than 5 years', 'more than 5 years')],
-                                         verbose_name='حداقل سابقه کار')
+                                                                   ('between 1 and 3 years', 'between 1 and 3 years'),
+                                                                   ('between 3 and 5 years', 'between 3 and 5 years'),
+                                                                   ('more than 5 years', 'more than 5 years')],
+                                          verbose_name='حداقل سابقه کار')
     salary = models.PositiveIntegerField(verbose_name='حقوق')
     description = models.TextField(verbose_name='توضیحات')
     about_company = models.TextField(verbose_name='درباره شرکت')
@@ -29,8 +29,8 @@ class JobAdvertisement(models.Model):
                               choices=[('male', 'male'), ('female', 'female'), ('both', 'both')],
                               verbose_name='جنسیت')
     employer = models.ForeignKey(Employer, on_delete=models.CASCADE, verbose_name='شرکت')
-    created_at = models.DateTimeField(auto_now_add=True,  verbose_name='تاریخ ایجاد')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاریخ به روز رسانی')
+    created_at = models.DateTimeField(auto_now_add=True, null=True, verbose_name='تاریخ ایجاد')
+    updated_at = models.DateTimeField(auto_now=True, null=True, verbose_name='تاریخ به روز رسانی')
 
 
 class JobCategory(models.Model):

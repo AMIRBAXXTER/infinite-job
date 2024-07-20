@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=100, verbose_name='عنوان')),
                 ('location', models.CharField(max_length=100, verbose_name='مکان')),
                 ('cooperation_type', models.CharField(choices=[('full_time', 'full_time'), ('part_time', 'part_time')], max_length=100, verbose_name='نوع همکاری')),
-                ('minimum_expertise', models.CharField(choices=[('less 1 year', 'less 1 year'), ('between 1 and 3 years', 'between 1 and 3 years'), ('between 3 and 5 years', 'between 3 and 5 years'), ('more than 5 years', 'more than 5 years')], max_length=100, verbose_name='حداقل سابقه کار')),
+                ('minimum_experience', models.CharField(choices=[('less 1 year', 'less 1 year'), ('between 1 and 3 years', 'between 1 and 3 years'), ('between 3 and 5 years', 'between 3 and 5 years'), ('more than 5 years', 'more than 5 years')], max_length=100, verbose_name='حداقل سابقه کار')),
                 ('salary', models.PositiveIntegerField(verbose_name='حقوق')),
                 ('description', models.TextField(verbose_name='توضیحات')),
                 ('about_company', models.TextField(verbose_name='درباره شرکت')),

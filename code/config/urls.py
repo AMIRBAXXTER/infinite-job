@@ -22,9 +22,10 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # Optional UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('', include('UserApp.urls', namespace='UserApp')),
-    path('', include('EmployersApp.urls', namespace='EmployersApp'))
+    path('', include('EmployersApp.urls', namespace='EmployersApp')),
+    path('', include('JobSeekerApp.urls', namespace='JobSeekerApp')),
+
 ]

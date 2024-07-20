@@ -52,7 +52,7 @@ services:
     restart: always
     volumes:
       - ./code/init.sql:/docker-entrypoint-initdb.d/init.sql
-#      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
   rabbitmq:
     image: rabbitmq:management
@@ -94,6 +94,18 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672/
     depends_on:
       - celery
+    networks:
+      - main
+
+  neo4j:
+    image: neo4j:latest
+    ports:
+      - "7474:747"
+      - "7687:7687"
+    container_name: neo4j
+    restart: always
+    environment:
+      - NEO$J_AUTH="neo4j/test"
     networks:
       - main
 
