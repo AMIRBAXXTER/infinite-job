@@ -8,12 +8,11 @@ from EmployersApp.serializers import JobAdvertisementSerializer
 
 
 # Create your views here.
-# todo : fix neo4j authentication problem
 class FavouriteJobAdView(APIView):
 
     def __init__(self, **kwargs):
         self.user_id = None
-        self.driver = GraphDatabase.driver("bolt://neo4j:7687", auth=("neo4j", "test"))
+        self.driver = GraphDatabase.driver("bolt://neo4j:7687", auth=("neo4j", "12345678"))
         super().__init__(**kwargs)
         
     def dispatch(self, request, *args, **kwargs):

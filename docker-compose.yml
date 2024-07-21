@@ -100,12 +100,12 @@ services:
   neo4j:
     image: neo4j:latest
     ports:
-      - "7474:747"
+      - "7474:7474"
       - "7687:7687"
     container_name: neo4j
     restart: always
     environment:
-      - NEO$J_AUTH="neo4j/test"
+      - NEO4J_AUTH=neo4j/12345678
     networks:
       - main
 
