@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # internal apps
     'UserApp.apps.UserAppConfig',
     'EmployersApp.apps.EmployersAppConfig',
+    'JobSeekerApp.apps.JobSeekerAppConfig',
     # external apps
     'rest_framework',
     'django_filters',
