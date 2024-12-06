@@ -8,3 +8,8 @@ class ApplyRequestPermission(BasePermission):
         if request.user.is_employer:
             return request.user == obj.job_advertisement.employer
         return request.user == obj.job_seeker
+
+
+class IsJobSeeker(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_job_seeker

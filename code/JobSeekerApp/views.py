@@ -2,6 +2,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework import viewsets
 from neo4j import GraphDatabase
 
 from EmployersApp.models import JobAdvertisement
@@ -9,7 +10,7 @@ from EmployersApp.serializers import JobAdvertisementSerializer
 
 from .models import ApplyRequest
 from .serializers import ApplyRequestSerializer
-from permissions import ApplyRequestPermission
+from permissions import ApplyRequestPermission, IsJobSeeker
 
 
 # Create your views here.
@@ -50,26 +51,24 @@ class FavouriteJobAdView(APIView):
         return Response({"message": "Job removed from user favourites successfully"}, status=status.HTTP_200_OK)
 
 
-class ApplyRequestView(APIView):
+class ApplyRequestView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, ApplyRequestPermission]
+    queryset = ApplyRequest.objects.all()
+    serializer_class = ApplyRequestSerializer
 
-    def __init__(self, **kwargs):
-        super().__init__(kwargs)
-        self.user = None
+    def get_permissions(self):
+        if self.action in ['create', 'destroy']:
+            self.permission_classes = [IsAuthenticated, IsJobSeeker]
+        self.permission_classes = [IsAuthenticated, ApplyRequestPermission]
+        return super().get_permissions()
 
-    def dispatch(self, request, *args, **kwargs):
-        self.user = request.user
-
-    def get(self, request):
-        if self.user.is_employer:
-            apply_requests = ApplyRequest.objects.filter(job_advertisement__employer=request.user)
-            return Response(ApplyRequestSerializer(apply_requests, many=True).data, status=status.HTTP_200_OK)
-        apply_requests = ApplyRequest.objects.filter(job_seeker=request.user)
-        return Response(ApplyRequestSerializer(apply_requests, many=True).data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        if not self.user.is_employer:
-            apply_request = ApplyRequest.objects.create(job_seeker=self.user,
-                                                        job_advertisement=request.data['job_advertisement'])
-            return Response(ApplyRequestSerializer(apply_request).data, status=status.HTTP_201_CREATED)
-    # TODO write other methods
+    def update(self, request, *args, **kwargs):
+        apply_request = self.get_object()
+        user = request.user
+        if user.is_employer:
+            apply_request.status = request.data['status']
+            apply_request.save()
+            return Response(ApplyRequestSerializer(apply_request).data, status=status.HTTP_200_OK)
+        apply_request.short_description = request.data['short_description']
+        apply_request.save()
+        return Response(ApplyRequestSerializer(apply_request).data, status=status.HTTP_200_OK)
